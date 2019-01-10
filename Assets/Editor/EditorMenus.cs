@@ -183,21 +183,27 @@ static class EditorMenus
         GameObject[] objs = Selection.gameObjects;
         m_AllLocalPositionItem.Clear();
 
-        for(int i = 0; i < objs.Length; i++)
+        if(objs != null && objs.Length > 0)
         {
-            var objTrans = objs[i].transform;
-            m_AllLocalPositionItem.Add(objTrans.localPosition);
-            m_AllLocalRotationItem.Add(objTrans.localRotation.eulerAngles);
-            m_AllLocalScaleItem.Add(objTrans.localScale);
+            for (int i = 0; i < objs.Length; i++)
+            {
+                var objTrans = objs[i].transform;
+                m_AllLocalPositionItem.Add(objTrans.localPosition);
+                m_AllLocalRotationItem.Add(objTrans.localRotation.eulerAngles);
+                m_AllLocalScaleItem.Add(objTrans.localScale);
+            }
+
+            for (int i = 0; i < objs.Length; i++)
+            {
+                int temp = (objs.Length - 1) - i;
+                Debug.LogFormat("Position Item {0} : {1} \n Rotation Item {0} : {2} \n Scale Item {0} : {3}", i, m_AllLocalPositionItem[temp], m_AllLocalRotationItem[temp], m_AllLocalScaleItem[temp]);
+            }
+        }
+        else
+        {
+            Debug.LogError("Select Object is Null!");
         }
 
-        for(int i = 0; i < objs.Length; i++)
-        {
-            int temp = (objs.Length - 1) - i;
-            Debug.LogFormat("Position Item {0} : {1} \n Rotation Item {0} : {2} \n Scale Item {0} : {3}", i,m_AllLocalPositionItem[temp], m_AllLocalRotationItem[temp], m_AllLocalScaleItem[temp]);
-        }
-
-        objs = null;
         Debug.Log("Save All Transform Property");
     }
 
@@ -206,31 +212,35 @@ static class EditorMenus
     {
         GameObject[] objs = Selection.gameObjects;
 
-        if(m_AllLocalPositionItem != null || m_AllLocalRotationItem != null || m_AllLocalScaleItem != null)
+        if(m_AllLocalPositionItem != null && m_AllLocalRotationItem != null && m_AllLocalScaleItem != null)
         {
-            if(m_AllLocalPositionItem.Count == 1)
+            if(objs != null && objs.Length > 0)
             {
-                for(int i = 0; i < objs.Length; i++)
+                if (m_AllLocalPositionItem.Count > 0)
                 {
-                    var objTrans = objs[i].transform;
-                    objTrans.localPosition = m_AllLocalPositionItem[0];
-                    //objTrans.localRotation = m_AllLocalRotationItem[0];
-                    objTrans.localRotation = Quaternion.Euler(m_AllLocalRotationItem[0].x, m_AllLocalRotationItem[0].y, m_AllLocalRotationItem[0].z);
-                    objTrans.localScale = m_AllLocalScaleItem[0];
+                    for (int i = 0; i < objs.Length; i++)
+                    {
+                        var objTrans = objs[i].transform;
+                        objTrans.localPosition = m_AllLocalPositionItem[0];
+                        objTrans.localRotation = Quaternion.Euler(m_AllLocalRotationItem[0].x, m_AllLocalRotationItem[0].y, m_AllLocalRotationItem[0].z);
+                        objTrans.localScale = m_AllLocalScaleItem[0];
+                    }
+                }
+                else
+                {
+                    for (int i = 0; i < objs.Length; i++)
+                    {
+                        var objTrans = objs[i].transform;
+                        objTrans.localPosition = m_AllLocalPositionItem[i];
+                        objTrans.localRotation = Quaternion.Euler(m_AllLocalRotationItem[i].x, m_AllLocalRotationItem[i].y, m_AllLocalRotationItem[i].z);
+                        objTrans.localScale = m_AllLocalScaleItem[i];
+                    }
                 }
             }
             else
             {
-                for(int i = 0; i < objs.Length; i++)
-                {
-                    var objTrans = objs[i].transform;
-                    objTrans.localPosition = m_AllLocalPositionItem[i];
-                    //objTrans.localRotation = m_AllLocalRotationItem[i];
-                    objTrans.localRotation = Quaternion.Euler(m_AllLocalRotationItem[i].x, m_AllLocalRotationItem[i].y, m_AllLocalRotationItem[i].z);
-                    objTrans.localScale = m_AllLocalScaleItem[i];
-                }    
+                Debug.LogError("Select Object is Null!");
             }
-            objs = null;
         }
         else
         {
@@ -244,6 +254,9 @@ static class EditorMenus
     static void FindComponent(MenuCommand menuCommand)
     {
         var component = menuCommand.context;
-        SceneModeUtility.SearchForType(component.GetType());
+        if(component != null)
+        {
+            SceneModeUtility.SearchForType(component.GetType());
+        }
     }
 }
